@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration View</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretty-checkbox@3.0/dist/pretty-checkbox.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            padding: 20px;
+            /* background-color: #f5f5f5; */
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            /* background-color: white; */
+            padding: 20px;
+            border-radius: 8px;
+            /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        }
+        .button {
+            margin-right: 10px;
+        }
+        .checkboxes {
+            margin-top: 20px;
+        }
+        .api-key-actions {
+            margin-top: 10px;
+        }
+        .button {
+            cursor: pointer;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            color: white;
+        }
+        .button.edit {
+            background-color: #4caf50;
+        }
+        .button.delete {
+            background-color: #f44336;
+        }
+        .pretty {
+            margin-bottom: 10px; /* Added padding between checkboxes */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Configuration Settings</h2>
+        <div class="checkboxes">
+            <h3>Code Config</h3>
+            <div class="pretty p-icon p-round p-smooth">
+                <input type="checkbox" id="Generate Code" checked/>
+                <div class="state p-success">
+                    <i class="icon mdi mdi-check"></i>
+                    <label> Generate Code</label>
+                </div>
+            </div>
+            <div class="pretty p-icon p-round p-smooth">
+                <input type="checkbox" id="Fix Bugs"/>
+                <div class="state p-success">
+                    <i class="icon mdi mdi-check"></i>
+                    <label> Fix Bugs</label>
+                </div>
+            </div>
+            <div class="pretty p-icon p-round p-smooth">
+                <input type="checkbox" id="Generate Comments"/>
+                <div class="state p-success">
+                    <i class="icon mdi mdi-check"></i>
+                    <label> Generate Comments</label>
+                </div>
+            </div>
+            <div class="pretty p-icon p-round p-smooth">
+                <input type="checkbox" id="Optimize Code" />
+                <div class="state p-success">
+                    <i class="icon mdi mdi-check"></i>
+                    <label> Optimize Code</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const vscode = acquireVsCodeApi();
+
+        // Load stored API key value
+        window.addEventListener('load', () => {
+            vscode.postMessage({ type: 'loadConfig' });
+        });
+
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                vscode.postMessage({ type: 'checkboxChange', id: checkbox.id, checked: checkbox.checked });
+            });
+        });
+
+        window.addEventListener('message', event => {
+            const message = event.data;
+            switch (message.type) {
+                case 'setCheckboxes':
+                    for (const [key, value] of Object.entries(message.checkboxes)) {
+                        if (key !== 'generate-code') {
+                            document.getElementById(key).checked = value;
+                        }
+                    }
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>
